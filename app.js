@@ -12,6 +12,7 @@ var usersRouter = require('./routes/users');
 var galleriesRouter = require('./routes/galleries');
 var imagesRouter = require('./routes/images');
 var statsRouter = require('./routes/stats');
+const authenticateOptional = require('./middleware/authenticateOptional');
 
 // app object
 var app = express();
@@ -25,6 +26,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(authenticateOptional);
+
 
 // use routers - zadania temat8
 app.use('/', indexRouter);

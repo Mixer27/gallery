@@ -53,7 +53,8 @@ exports.user_login_post = (req, res, next) => {
 // GET - Kontroler wylogowania
 exports.user_logout_get = (req, res, next) => {
 res.clearCookie('mytoken')
-res.render('index', { title: 'Express' });
+// res.render('index', { title: 'Express' });
+res.redirect('/');
 }
 
 // NEW USER

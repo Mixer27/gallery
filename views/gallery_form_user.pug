@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  h1= title
+
+  form(method='POST')
+    div.form-group
+      label(for='g_name') Gallery name:
+      input#g_name.form-control(type='text', name='g_name', required, value=(gallery ? gallery.name : ''))
+
+      label(for='g_description') Description:
+      input#g_description.form-control(type='text', name='g_description', required, value=(gallery ? gallery.description : ''))
+
+      // Pole użytkownika ukryte (zalogowany użytkownik)
+      input(type='hidden', name='g_user', value=currentUser._id)
+
+    button.btn.btn-primary(type='submit') Submit
+
+  if messages
+    ul
+      each message in messages
+        li= message

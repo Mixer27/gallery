@@ -11,16 +11,43 @@ exports.gallery_list = asyncHandler(async (req, res, next) => {
 // Import walidatora.
 const { body, validationResult } = require("express-validator");
 
+
 // GET - Kontroler wyświetlania formularza dodawania nowej galerii (metoda GET).
 exports.gallery_add_get = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    // Jeśli użytkownik nie jest zalogowany, przekieruj na login lub pokaż błąd
+    return res.redirect('/users/user_login');
+  }
+
   // pobranie listy userów z bazy
-  const all_users = await user.find().sort({surname:1}).exec();
-  // rendering formularza
-  res.render("gallery_form", {
-    title: "Add gallery",
-    users: all_users,
+  const all_users = await user.find().sort({ surname: 1 }).exec();
+
+  // Jeśli użytkownik ma rolę "admin" (lub jakąś inną logikę), pokaż standardowy formularz
+  if (req.user.username === 'admin') {
+    return res.render("gallery_form", {
+      title: "Add gallery (admin)",
+      users: all_users,
+    });
+  }
+
+  // Dla zwykłego użytkownika - formularz bez wyboru użytkownika (bo już wiadomo kto tworzy)
+  console.log(req.user);
+  res.render("gallery_form_user", {
+    title: "Add gallery (user)",
+    currentUser: req.user, // do automatycznego przypisania właściciela
   });
 });
+
+// GET - Kontroler wyświetlania formularza dodawania nowej galerii (metoda GET).
+// exports.gallery_add_get = asyncHandler(async (req, res, next) => {
+//   // pobranie listy userów z bazy
+//   const all_users = await user.find().sort({surname:1}).exec();
+//   // rendering formularza
+//   res.render("gallery_form", {
+//     title: "Add gallery",
+//     users: all_users,
+//   });
+// });
 
 // POST - Kontroler (lista funkcji) obsługi danych z formularza dodawania nowej galerii (metoda POST).
 exports.gallery_add_post = [
