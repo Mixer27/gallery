@@ -1,6 +1,6 @@
 const gallery = require("../models/gallery");
 const user = require("../models/user");
-
+const image = require("../models/image");
 const asyncHandler = require("express-async-handler");
 
 exports.gallery_list = asyncHandler(async (req, res, next) => {
@@ -131,3 +131,25 @@ exports.gallery_add_post = [
     });
   }),
 ];
+
+
+// Kontroler wyświetlania formularza GET gallery_browse - wyświetla formularz wyboru galerii
+exports.gallery_browse_get = asyncHandler(async (req, res, next) => {
+// Pokaż formularz wyboru gallerii
+const all_galleries = await gallery.find({}).exec();
+res.render("gallery_browse", { title: "Select gallery:", galleries: all_galleries, loggedUser: req.loggedUser
+});
+});
+// Kontroler przetwarzania formularza POST gallery_browse - wyświetla brazki, ale też formularz wyboru galerii
+exports.gallery_browse_post = asyncHandler(async (req, res, next) => {
+// Pokaż listę obrazków wybranej gallerii
+const all_galleries = await gallery.find({}).exec();
+let gallery_images = [];
+let sel_gallery = null
+if (req.body.s_gallery) {
+gallery_images = await image.find({ gallery: req.body.s_gallery }).exec();
+sel_gallery = req.body.s_gallery
+}
+res.render("gallery_browse", { title: "View gallery:", galleries: all_galleries, images: gallery_images,
+sel_gallery: sel_gallery, loggedUser: req.loggedUser});
+});

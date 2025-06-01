@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  h1= title
+
+  form(method='POST')
+    div.form-group
+      label(for='s_gallery') Select gallery:
+      //- lista rozwijana wyboru galerii
+      select#s_gallery.form-control(name='s_gallery', required)
+        for gallery in galleries
+          if sel_gallery == gallery._id
+            option(value=gallery._id selected)= gallery.name
+          else
+            option(value=gallery._id)= gallery.name
+
+    button.btn.btn-primary(type='submit') Submit
+
+  if images
+    div(style="display:flex; flex-wrap:wrap;")
+      each image in images
+        div(style='display:flex; flex-direction:column; width:20%; height:100%; margin:20px;')
+          img(src=image.path, alt=image.path, style='max-width:100%; object-fit:scale-down;')
+          h2= image.name
+          a Description: #{image.description}
+  else
+    p There are no any images.
+
+  if messages
+    ul
+      each message in messages
+        li!= message
