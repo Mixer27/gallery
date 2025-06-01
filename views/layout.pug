@@ -38,5 +38,13 @@ html(lang='pl-PL')
                 a(href='/users/user_add') Add user
               li
                 a(href='/galleries/gallery_add') Add gallery
+              li
+                hr
+                if loggedUser
+                  a(href='/users/user_login') Login (logged as #{loggedUser})
+                else
+                  a(href='/users/user_login') Login (not logged)
+              li
+                a(href='/users/user_logout') Logout
         div(class='col-sm-10')
           block content

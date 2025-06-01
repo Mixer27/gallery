@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1= title
+  form(method='POST')
+    .form-group
+      label(for='username') Username:
+      input#username.form-control(type='text', placeholder='username', name='username', required, value='')
+      
+      label(for='password') Password:
+      input#password.form-control(type='password', placeholder='password', name='password', autocomplete='off', required, value='')
+
+    button.btn.btn-primary(type='submit') Login
+
+  if messages
+    ul
+      each message in messages
+        li!= message

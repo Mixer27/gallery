@@ -6,6 +6,7 @@ const UserSchema = new Schema({
   name: { type: String, maxLength: 100 },
   surname: { type: String, maxLength: 100 },
   username: { type: String, maxLength: 100 },
+  password: { type: String},
 }, { collection: 'users'});
 
 // Export model
