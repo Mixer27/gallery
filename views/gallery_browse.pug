@@ -2,18 +2,16 @@ extends layout
 
 block content
   h1= title
-
   form(method='POST')
     div.form-group
       label(for='s_gallery') Select gallery:
       //- lista rozwijana wyboru galerii
       select#s_gallery.form-control(name='s_gallery', required)
         for gallery in galleries
-          if sel_gallery == gallery._id
-            option(value=gallery._id selected)= gallery.name
+          if (sel_gallery == gallery._id)
+            option(value=gallery._id, selected) #{gallery.name} #{gallery.user.username}
           else
-            option(value=gallery._id)= gallery.name
-
+            option(value=gallery._id) #{gallery.name} #{gallery.user.username}
     button.btn.btn-primary(type='submit') Submit
 
   if images
@@ -21,12 +19,18 @@ block content
       each image in images
         div(style='display:flex; flex-direction:column; width:20%; height:100%; margin:20px;')
           img(src=image.path, alt=image.path, style='max-width:100%; object-fit:scale-down;')
-          h2= image.name
+          h2 #{image.name}
           a Description: #{image.description}
+          a(href='/images/image_show?image_id=' + image._id)
+            button.btn.btn-primary(type='submit') Show
+          a(href='/images/image_update?image_id=' + image._id + '&gallery_id=' + sel_gallery)
+            button.btn.btn-primary(type='submit') Update
+          form(action='/images/image_delete/' + image._id, method='POST')
+            button.btn.btn-primary(type='submit') Delete
   else
     p There are no any images.
 
   if messages
     ul
-      each message in messages
+      for message in messages
         li!= message

@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1= title
+
+  if image
+    .image-container
+      h2= image.name
+      if image.gallery
+        p Gallery: #{image.gallery.name}
+      if image.description
+        p Description: #{image.description}
+      img(src=`${image.path}` alt=image.name style="max-width: 600px; max-height: 400px; margin-top: 10px;")
+
+  else
+    p Image not found.

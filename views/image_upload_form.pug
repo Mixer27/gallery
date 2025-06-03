@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+  form(method='POST', enctype='multipart/form-data')
+    label(for='file') Select file:
+    input#file.form-control(type='file', name='file', required)
+    button.btn.btn-primary(type='submit') Submit
+  if messages
+    ul
+      for message in messages
+        li!= message
