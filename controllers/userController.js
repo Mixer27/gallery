@@ -1,6 +1,10 @@
 const user = require("../models/user");
+const gallery = require("../models/gallery")
+const image = require("../models/image")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fs = require("fs/promises");
+const path = require("path");
 
 
 // asynchronicznie
@@ -52,16 +56,18 @@ exports.user_login_post = (req, res, next) => {
 
 // GET - Kontroler wylogowania
 exports.user_logout_get = (req, res, next) => {
-res.clearCookie('mytoken')
-// res.render('index', { title: 'Express' });
-res.redirect('/');
+  res.clearCookie('mytoken')
+  // res.render('index', { title: 'Express' });
+  res.redirect('/');
 }
 
 // NEW USER
 
 // GET - Kontroler wyświetlania formularza dodawania nowego usera (metoda GET).
 exports.user_add_get = (req, res, next) => {
-  res.render("user_form", { title: "Add users" });
+  console.log(req.loggedUser);
+  if (req.loggedUser === "admin") res.render("user_form", { title: "Add users" });
+  else res.redirect('/');
 };
 
 // Import funkcji walidatora.
@@ -154,3 +160,56 @@ exports.user_add_post = [
 
 ];
 
+// DELETE - Kontroler usuwania użytkownika
+exports.user_delete = asyncHandler(async (req, res, next) => {
+  // tylko admin może usuwać użytkowników
+  if (req.loggedUser !== "admin") {
+    return res.status(403).send("Access denied");
+  }
+
+  const userId = req.params.user_id;
+
+  // zabezpieczenie: nie pozwól adminowi usunąć samego siebie
+  const userToDelete = await user.findById(userId).exec();
+
+  if (!userToDelete) {
+    return res.status(404).send("User not found");
+  }
+
+  if (userToDelete.username === "admin") {
+    return res.status(400).send("Cannot delete admin user");
+  }
+
+  // 1. Pobierz wszystkie galerie użytkownika
+  const userGalleries = await gallery.find({ user: userId }).exec();
+
+  for (const gal of userGalleries) {
+    // 2. Pobierz obrazki przypisane do tej galerii
+    const galleryImages = await image.find({ gallery: gal._id }).exec();
+
+    for (const img of galleryImages) {
+      // 3. Usuń plik z dysku
+      const filePath = path.join(__dirname, "../public/images", img.path);
+      try {
+        await fs.unlink(filePath);
+        console.log(`Deleted image file: ${filePath}`);
+      } catch (err) {
+        console.warn(`File deletion failed or not found: ${filePath}`, err.message);
+      }
+
+      // 4. Usuń wpis z bazy
+      await image.findByIdAndDelete(img._id);
+    }
+
+    // 5. Usuń galerię po usunięciu obrazków
+    await gallery.findByIdAndDelete(gal._id);
+  }
+
+  // 6. Usuń użytkownika
+  await user.findByIdAndDelete(userId);
+
+  // await gallery
+  // await image
+  // await user.findByIdAndDelete(userId);
+  res.redirect("/users");
+});

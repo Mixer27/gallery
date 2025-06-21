@@ -2,9 +2,14 @@ extends layout
 
 block content
   h1= title
+
   if user_list.length
     each user in user_list
       ul
-        li #{user.name} #{user.surname}
+        li
+          | #{user.name} #{user.surname} (#{user.username})
+          if loggedUser === 'admin' && user.username !== 'admin'
+            form(action=`/users/user_delete/${user._id}`, method='POST', style='display:inline', onsubmit='return confirm("Are you sure you want to delete this user?")')
+              button.btn.btn-danger.btn-sm(type='submit') Delete
   else
     p There are no users.
