@@ -86,8 +86,8 @@ exports.gallery_add_post = [
     // Sprawdzenie i obsługa ewentualnych błędów.
     if (!errors.isEmpty()) {
       // Jeśli pojawiły się błędy - ponownie wyrenderuj formularz i wypełnij pola wprowadzonymi danymi po sanityzacji.
-      
-      let myMessages=[]
+
+      let myMessages = []
       errors.array().forEach(err => myMessages.push(err.msg))
 
       // const all_users = await user.find().sort({ last_name: 1 }).exec();
@@ -98,28 +98,28 @@ exports.gallery_add_post = [
         messages: myMessages,
       });
       return;
-    } 
-    
+    }
+
     // Dane z formularza są poprawne.
     // Należy jeszcze sprawdzić czy w bazie istnieje galeria
     // o tej samej nazwie dla wskazanego użytkownika.
     const galleryExists = await gallery.findOne({
       name: req.body.g_name,
       user: req.body.g_user,
-      })
+    })
       .collation({ locale: "pl", strength: 2 })
       .exec();
 
     if (galleryExists) {
       // Błąd - nazwa galerii dla wybranego użytkownika już istnieje, ponowne wyświetlenie formularza z komunikatem
-        res.render("gallery_form", {
+      res.render("gallery_form", {
         title: "Add gallery:",
         gallery: newgallery,
         users: all_users,
         messages: [`Gallery "${newgallery.name}" already exists!`]
       });
       return;
-    } 
+    }
 
     // Zapisz do bazy nową galerię.
     // Wyświetl pusty formularz i komunikat.
@@ -137,7 +137,7 @@ exports.gallery_add_post = [
 // usuwanie galerii wraz z jej wszystkimi obrazkami
 exports.gallery_delete = asyncHandler(async (req, res, next) => {
   const galleryId = req.params.gallery_id;
-  
+
   // Znajdź galerię
   const gal = await gallery.findById(galleryId).exec();
 
@@ -175,21 +175,24 @@ exports.gallery_delete = asyncHandler(async (req, res, next) => {
 
 // Kontroler wyświetlania formularza GET gallery_browse - wyświetla formularz wyboru galerii
 exports.gallery_browse_get = asyncHandler(async (req, res, next) => {
-// Pokaż formularz wyboru gallerii
-const all_galleries = await gallery.find({}).exec();
-res.render("gallery_browse", { title: "Select gallery:", galleries: all_galleries, loggedUser: req.loggedUser
-});
+  // Pokaż formularz wyboru gallerii
+  const all_galleries = await gallery.find({}).exec();
+  res.render("gallery_browse", {
+    title: "Select gallery:", galleries: all_galleries, loggedUser: req.loggedUser
+  });
 });
 // Kontroler przetwarzania formularza POST gallery_browse - wyświetla brazki, ale też formularz wyboru galerii
 exports.gallery_browse_post = asyncHandler(async (req, res, next) => {
-// Pokaż listę obrazków wybranej gallerii
-const all_galleries = await gallery.find({}).exec();
-let gallery_images = [];
-let sel_gallery = null
-if (req.body.s_gallery) {
-gallery_images = await image.find({ gallery: req.body.s_gallery }).exec();
-sel_gallery = req.body.s_gallery
-}
-res.render("gallery_browse", { title: "View gallery:", galleries: all_galleries, images: gallery_images,
-sel_gallery: sel_gallery, loggedUser: req.loggedUser});
+  // Pokaż listę obrazków wybranej gallerii
+  const all_galleries = await gallery.find({}).exec();
+  let gallery_images = [];
+  let sel_gallery = null
+  if (req.body.s_gallery) {
+    gallery_images = await image.find({ gallery: req.body.s_gallery }).exec();
+    sel_gallery = req.body.s_gallery
+  }
+  res.render("gallery_browse", {
+    title: "View gallery:", galleries: all_galleries, images: gallery_images,
+    sel_gallery: sel_gallery, loggedUser: req.loggedUser
+  });
 });
