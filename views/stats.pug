@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  .container.mt-4
+    h1.mb-4.text-center= title
+
+    .row
+      .col-md-4
+        .card.text-white.bg-info.mb-3
+          .card-header.text-center Users
+          .card-body
+            h4.card-title.text-center= stats.users
+            p.card-text.text-center Total registered users
+      .col-md-4
+        .card.text-white.bg-success.mb-3
+          .card-header.text-center Galleries
+          .card-body
+            h4.card-title.text-center= stats.galleries
+            p.card-text.text-center Total galleries created
+      .col-md-4
+        .card.text-white.bg-warning.mb-3
+          .card-header.text-center Images
+          .card-body
+            h4.card-title.text-center= stats.images
+            p.card-text.text-center Total uploaded images

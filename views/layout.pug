@@ -18,7 +18,7 @@ html(lang='pl-PL')
 
     link(rel='stylesheet' href='/stylesheets/style.css')
 
-  body
+  body(class="d-flex flex-column min-vh-100")
     div(class='p-3 bg-primary text-white text-center')
       h1 Gallery App
     nav(class='navbar navbar-expand-sm bg-dark mavbar-dark')
@@ -31,9 +31,9 @@ html(lang='pl-PL')
               a(class='nav-link' href='') logged as #{loggedUser}
             else
               a(class='nav-link active' href='/users/user_login') Login (not logged)
-    div(class='container-fluid')    
+    div(class='container-fluid flex-grow-1')    
       div(class='row')
-        div(class='col-sm-2')
+        div(class='col-sm-2 mt-3')
           //- block sidebar
           ul(class='nav flex-column')
             li(class='nav-item')

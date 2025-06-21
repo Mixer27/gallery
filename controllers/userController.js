@@ -41,7 +41,7 @@ exports.user_login_post = (req, res, next) => {
             let token = jwt.sign({ username: user.username }, 'kodSzyfrujacy', { expiresIn: '1h' });
             res.cookie('mytoken', token, { maxAge: 600000 });
             // Login OK
-            res.render('index', { title: 'Express', loggedUser: user.username });
+            res.render('index', { title: 'Gallery', loggedUser: user.username });
           } else {
             // Bad pass
             res.render("user_login_form", { title: "Login", messages: ["Bad pass!"] });

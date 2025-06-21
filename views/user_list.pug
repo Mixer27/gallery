@@ -1,15 +1,23 @@
 extends layout
 
 block content
-  h1= title
+  .container.mt-4
+    h1.mb-4= title
 
-  if user_list.length
-    each user in user_list
-      ul
-        li
-          | #{user.name} #{user.surname} (#{user.username})
-          if loggedUser === 'admin' && user.username !== 'admin'
-            form(action=`/users/user_delete/${user._id}`, method='POST', style='display:inline', onsubmit='return confirm("Are you sure you want to delete this user?")')
-              button.btn.btn-danger.btn-sm(type='submit') Delete
-  else
-    p There are no users.
+    if user_list.length
+      .card
+        .card-header.bg-primary.text-white
+          | Users
+        ul.list-group.list-group-flush
+          each user in user_list
+            li.list-group-item
+              .d-flex.justify-content-between.align-items-center
+                .w-75
+                  h5.mb-1= `${user.name} ${user.surname}`
+                  small.text-muted (#{user.username})
+                if loggedUser === 'admin' && user.username !== 'admin'
+                  form(action=`/users/user_delete/${user._id}`, method='POST', onsubmit="return confirm('Are you sure you want to delete this user?')")
+                    button.btn.btn-danger.btn-sm(type='submit') Delete
+    else
+      .alert.alert-warning.text-center
+        | There are no users yet.

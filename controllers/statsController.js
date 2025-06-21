@@ -8,5 +8,14 @@ exports.stats_list = asyncHandler(async (req, res, next) => {
   const numUsers = await user.countDocuments({}).exec();
   const numGalleries = await gallery.countDocuments({}).exec();
   const numImages = await image.countDocuments({}).exec();
-  res.send(`Users: ${numUsers} <br>Galleries: ${numGalleries} <br>Images: ${numImages}<br>`);
+  res.render("stats", {
+    title: "Stats",
+    stats: {
+      users: numUsers,
+      galleries: numGalleries,
+      images: numImages
+    }
+  });
+
+  // res.send(`Users: ${numUsers} <br>Galleries: ${numGalleries} <br>Images: ${numImages}<br>`);
 });
