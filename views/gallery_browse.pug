@@ -18,7 +18,7 @@ block content
     div(style="display:flex; flex-wrap:wrap;")
       each image in images
         div(style='display:flex; flex-direction:column; width:20%; height:100%; margin:20px;')
-          img(src=image.path, alt=image.path, style='max-width:100%; object-fit:scale-down;')
+          img(src=image.path, alt=image.path, style='max-width:200px; object-fit:scale-down;')
           h2 #{image.name}
           a Description: #{image.description}
           a(href='/images/image_show?image_id=' + image._id)

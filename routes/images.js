@@ -7,7 +7,7 @@ const image_controller = require("../controllers/imageController");
 router.get("/", image_controller.image_list);
 
 // Wyświetlania powiększonego obrazka
-router.get("/image_show", image_controller.image_show_get);
+router.get("/image_show", authenticate, image_controller.image_show_get);
 
 //Wyświetlanie formularza dodawania obrazka - GET.
 router.get("/image_add", authenticate, image_controller.image_add_get);
