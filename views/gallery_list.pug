@@ -2,9 +2,14 @@ extends layout
 
 block content
   h1= title
+
   if gallery_list.length
     each gallery in gallery_list
       ul
-        li #{gallery.name}; #{gallery.description}; #{gallery.date}; #{gallery.user.surname}
+        li
+          | #{gallery.name}; #{gallery.description}; #{gallery.date.toDateString()}; #{gallery.user.surname}
+          if currentUser && (currentUser.username === 'admin' || gallery.user._id.toString() === currentUser._id.toString())
+            form(action=`/galleries/gallery_delete/${gallery._id}`, method='POST', style='display:inline', onsubmit="return confirm('Delete this gallery and all its images?')")
+              button.btn.btn-danger.btn-sm(type='submit') Delete
   else
     p There are no any galleries.

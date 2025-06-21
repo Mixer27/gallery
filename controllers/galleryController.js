@@ -2,10 +2,12 @@ const gallery = require("../models/gallery");
 const user = require("../models/user");
 const image = require("../models/image");
 const asyncHandler = require("express-async-handler");
+const fs = require("fs/promises");
+const path = require("path");
 
 exports.gallery_list = asyncHandler(async (req, res, next) => {
   const all_galleries = await gallery.find({}).populate("user").exec();
-  res.render("gallery_list", { title: "List of all galleries:", gallery_list: all_galleries });
+  res.render("gallery_list", { title: "List of all galleries:", gallery_list: all_galleries, currentUser: req.user });
 });
 
 // Import walidatora.
@@ -131,6 +133,44 @@ exports.gallery_add_post = [
     });
   }),
 ];
+
+// usuwanie galerii wraz z jej wszystkimi obrazkami
+exports.gallery_delete = asyncHandler(async (req, res, next) => {
+  const galleryId = req.params.gallery_id;
+  
+  // Znajdź galerię
+  const gal = await gallery.findById(galleryId).exec();
+
+  if (!gal) {
+    return res.status(404).send("Gallery not found");
+  }
+  console.log(gal.user._id, req.user._id)
+  // if (gal.user != req.user._id) {
+  //   return res.status(401).send("Cant delete gallery that is not your!");
+  // }
+
+  // Znajdź obrazki powiązane z galerią
+  const galleryImages = await image.find({ gallery: galleryId }).exec();
+
+  for (const img of galleryImages) {
+    const filePath = path.join(__dirname, "../public/images", img.path);
+    try {
+      await fs.unlink(filePath);
+      console.log(`Deleted image file: ${filePath}`);
+    } catch (err) {
+      console.warn(`File deletion failed: ${filePath}`, err.message);
+    }
+
+    await image.findByIdAndDelete(img._id);
+  }
+
+  // Usuń galerię
+  await gallery.findByIdAndDelete(galleryId);
+
+  // Przekierowanie lub info
+  res.redirect("/galleries");
+});
+
 
 
 // Kontroler wyświetlania formularza GET gallery_browse - wyświetla formularz wyboru galerii
