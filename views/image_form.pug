@@ -3,7 +3,7 @@ extends layout
 block content
   h1= title
 
-  form(method='POST')
+  form(method='POST', enctype='multipart/form-data')
     div.form-group
       label(for='i_name') Image Name:
       input#i_name.form-control(type='text', placeholder='min. 2 litery', name='i_name', required, value=(image ? image.name : ''))
@@ -18,10 +18,10 @@ block content
       select#i_gallery.form-control(name='i_gallery', required)
         option(value='') --Select a gallery--
         for gallery in galleries
-          if image && image.gallery && gallery._id.toString() === image.gallery._id.toString()
-            option(value=gallery._id selected)= gallery.name
-          else
-            option(value=gallery._id)= gallery.name
+          //- if image && image.gallery && gallery._id.toString() === image.gallery._id.toString()
+          //-   option(value=gallery._id selected)= gallery.name
+          //- else
+          option(value=gallery._id)= gallery.name
 
     button.btn.btn-primary(type='submit') Submit
 

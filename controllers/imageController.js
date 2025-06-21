@@ -2,10 +2,12 @@ const image = require("../models/image");
 const gallery = require("../models/gallery");
 const asyncHandler = require("express-async-handler");
 const user = require("../models/user");
+const fs = require("fs/promises");
+const path = require("path");
 
 exports.image_list = asyncHandler(async (req, res, next) => {
   const all_images = await image.find({}).populate("gallery").exec();
- res.render("image_list", { title: "List of all images:", image_list: all_images });
+  res.render("image_list", { title: "List of all images:", image_list: all_images });
 });
 
 // GET - Wyświetlanie formularza dodawania obrazka
@@ -30,25 +32,32 @@ exports.image_add_get = asyncHandler(async (req, res, next) => {
 
 const { body, validationResult } = require("express-validator");
 
-// POST - Przetwarzanie formularza dodawania obrazka
-exports.image_add_post = [
-  // Walidacja i sanityzacja
-  body("i_name", "Image name too short").trim().isLength({ min: 2 }).escape(),
-  body("i_description").trim().escape(),
-  body("i_gallery", "Gallery must be selected").trim().isLength({ min: 1 }).escape(),
+exports.image_add_post = asyncHandler(async (req, res, next) => {
+  const form = new formidable.IncomingForm({
+    uploadDir: path.join(__dirname, "../public/images"),
+    keepExtensions: true,
+    multiples: false,
+  });
 
-  asyncHandler(async (req, res, next) => {
-    const errors = validationResult(req);
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.render("image_form", {
+        title: "Add image",
+        messages: ["Error parsing form data."],
+        galleries: [],
+        image: {},
+      });
+    }
 
-    // Tworzenie nowego obiektu Image
-    const newImage = new image({
-      name: req.body.i_name,
-      description: req.body.i_description,
-      path: req.body.i_path || "placeholder.jpg", // domyślna ścieżka pliku
-      gallery: req.body.i_gallery,
-    });
+    const { i_name, i_description, i_gallery } = fields;
+    const file = files.i_path;
 
-    // Wczytaj galerie (dla ponownego renderowania przy błędach)
+    const validationErrors = [];
+    if (!i_name[0] || i_name[0].trim().length < 2) validationErrors.push("Image name too short");
+    if (!i_gallery[0]) validationErrors.push("Gallery must be selected");
+    if (!file[0] || !file[0].newFilename) validationErrors.push("No file uploaded");
+
+    // Wczytaj galerie
     let galleries;
     if (req.user.username === 'admin') {
       galleries = await gallery.find().sort({ name: 1 }).exec();
@@ -56,45 +65,102 @@ exports.image_add_post = [
       galleries = await gallery.find({ user: req.user._id }).sort({ name: 1 }).exec();
     }
 
-    if (!errors.isEmpty()) {
+    if (validationErrors.length > 0) {
       return res.render("image_form", {
         title: "Add image",
         galleries: galleries,
-        image: newImage,
-        messages: errors.array().map(e => e.msg),
+        image: {
+          name: i_name,
+          description: i_description,
+          gallery: i_gallery,
+        },
+        messages: validationErrors,
       });
     }
 
-    // Zapisz obraz do bazy
+    const newImage = new image({
+      name: i_name[0],
+      description: i_description[0],
+      path: file[0].newFilename,
+      gallery: i_gallery[0],
+    });
+
     await newImage.save();
-    res.render("image_form", {
+
+    return res.render("image_form", {
       title: "Add image",
       galleries: galleries,
-      messages: [`Image "${newImage.name}" added!`],
+      messages: [`Image "${newImage.name}" added and file uploaded!`],
     });
-  })
-];
+  });
+});
+
+
+// POST - Przetwarzanie formularza dodawania obrazka
+// exports.image_add_post = [
+//   // Walidacja i sanityzacja
+//   body("i_name", "Image name too short").trim().isLength({ min: 2 }).escape(),
+//   body("i_description").trim().escape(),
+//   body("i_gallery", "Gallery must be selected").trim().isLength({ min: 1 }).escape(),
+
+//   asyncHandler(async (req, res, next) => {
+//     const errors = validationResult(req);
+
+//     // Tworzenie nowego obiektu Image
+//     const newImage = new image({
+//       name: req.body.i_name,
+//       description: req.body.i_description,
+//       path: req.body.i_path || "placeholder.jpg", // domyślna ścieżka pliku
+//       gallery: req.body.i_gallery,
+//     });
+
+//     // Wczytaj galerie (dla ponownego renderowania przy błędach)
+//     let galleries;
+//     if (req.user.username === 'admin') {
+//       galleries = await gallery.find().sort({ name: 1 }).exec();
+//     } else {
+//       galleries = await gallery.find({ user: req.user._id }).sort({ name: 1 }).exec();
+//     }
+
+//     if (!errors.isEmpty()) {
+//       return res.render("image_form", {
+//         title: "Add image",
+//         galleries: galleries,
+//         image: newImage,
+//         messages: errors.array().map(e => e.msg),
+//       });
+//     }
+
+//     // Zapisz obraz do bazy
+//     await newImage.save();
+//     res.render("image_form", {
+//       title: "Add image",
+//       galleries: galleries,
+//       messages: [`Image "${newImage.name}" added!`],
+//     });
+//   })
+// ];
 
 // IMAGE UPDATE GET
 // Kontroler wyświetlania formularza update'u obrazka - GET.
 exports.image_update_get = asyncHandler(async (req, res, next) => {
-let all_galleries;
-if (req.user.username === "admin") {
-// dane do formularza - zalogowany admin
-all_galleries = await gallery.find({}).sort({ name: 1 }).exec();
-} else {
-// dane do formularza - użytkownik zwykły
-let user_id = await user.findOne({ "username": req.user.username }).exec();
-all_galleries = await gallery.find({ "user": user_id }).exec();
-}
-//const image_id = req.query.image_id;
-const imageObj = await image.findOne({ _id: req.query.image_id }).exec();
-res.render("image_update", {
-title: "Image update:",
-image: imageObj,
-galleries: all_galleries,
-messages: []
-});
+  let all_galleries;
+  if (req.user.username === "admin") {
+    // dane do formularza - zalogowany admin
+    all_galleries = await gallery.find({}).sort({ name: 1 }).exec();
+  } else {
+    // dane do formularza - użytkownik zwykły
+    let user_id = await user.findOne({ "username": req.user.username }).exec();
+    all_galleries = await gallery.find({ "user": user_id }).exec();
+  }
+  //const image_id = req.query.image_id;
+  const imageObj = await image.findOne({ _id: req.query.image_id }).exec();
+  res.render("image_update", {
+    title: "Image update:",
+    image: imageObj,
+    galleries: all_galleries,
+    messages: []
+  });
 });
 
 // IMAGE SHOW GET
@@ -121,56 +187,65 @@ exports.image_show_get = asyncHandler(async (req, res, next) => {
 // IMAGE UPDATE POST
 // Kontroler przetwarzania formularza update'u obrazka - POST.
 exports.image_update_post = asyncHandler(async (req, res, next) => {
-const filter = {_id: req.query.image_id};
-const update = {
-name: req.body.i_name,
-description: req.body.i_description,
-gallery: req.body.i_gallery,
-};
-let doc=await image.findOneAndUpdate(filter, update);
-if (doc) {
-res.redirect("../galleries/gallery_browse")
-} else {
-res.send('Image update error');
-}
+  const filter = { _id: req.query.image_id };
+  const update = {
+    name: req.body.i_name,
+    description: req.body.i_description,
+    gallery: req.body.i_gallery,
+  };
+  let doc = await image.findOneAndUpdate(filter, update);
+  if (doc) {
+    res.redirect("../galleries/gallery_browse")
+  } else {
+    res.send('Image update error');
+  }
 });
 
 // IMAGE DELETE
 // Kontroler usuwania obrazka - POST
 exports.image_delete = asyncHandler(async (req, res, next) => {
-const filter = {_id: req.params.image_id};
-let doc=await image.findOneAndDelete(filter);
-if (doc) {
-res.redirect("../../galleries/gallery_browse")
-} else {
-res.send('Error - image not deleted');
-}
+  const filter = { _id: req.params.image_id };
+  let doc = await image.findOneAndDelete(filter);
+  if (doc) {
+    const filePath = path.join(__dirname, "../public/images", doc.path);
+    console.log(filePath)
+    try {
+      await fs.unlink(filePath);
+      console.log(`Deleted file: ${filePath}`);
+    } catch (err) {
+      console.warn(`File deletion failed or file not found: ${filePath}`, err.message);
+    }
+
+    res.redirect("../../galleries/gallery_browse")
+  } else {
+    res.send('Error - image not deleted');
+  }
 });
 
 // UPLOAD GET
 // Formularz wyboru pliku uploadu
 exports.image_upload_get = asyncHandler(async (req, res, next) => {
-res.render("image_upload_form", { title: "Upload image:" });
+  res.render("image_upload_form", { title: "Upload image:" });
 });
 
 // UPLOAD POST
 // Obsługa danych formularza uploadu
 const formidable = require('formidable');
-const path = require("path");
+const { fstat } = require("fs");
 exports.image_upload_post = asyncHandler(async (req, res, next) => {
-const form = new formidable.IncomingForm({
-uploadDir: path.join(__dirname, "../public/images"),
-multiples: false,
-keepExtensions: true
-});
-let messages = [];
-form.parse(req, (err, fields, files) => {
-if (err) {
-messages.push("Image upload error!");
-}
-else {
-messages.push("Image uploaded!");
-}
-res.render("image_upload_form", { title: "Upload image:", messages });
-});
+  const form = new formidable.IncomingForm({
+    uploadDir: path.join(__dirname, "../public/images"),
+    multiples: false,
+    keepExtensions: true
+  });
+  let messages = [];
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      messages.push("Image upload error!");
+    }
+    else {
+      messages.push("Image uploaded!");
+    }
+    res.render("image_upload_form", { title: "Upload image:", messages });
+  });
 });
