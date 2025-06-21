@@ -193,6 +193,7 @@ exports.image_update_post = asyncHandler(async (req, res, next) => {
     description: req.body.i_description,
     gallery: req.body.i_gallery,
   };
+  console.log(update)
   let doc = await image.findOneAndUpdate(filter, update);
   if (doc) {
     res.redirect("../galleries/gallery_browse")
