@@ -1,29 +1,49 @@
 extends layout
 
 block content
-  h1=title
+  .container.mt-4
+    .row.justify-content-center
+      .col-md-8
+        .card
+          .card-header.bg-primary.text-white
+            h4.mb-0= title
 
-  form(method='POST')
-    div.form-group
-      label(for='g_name') Gallery name:
-      input#g_name.form-control(type='text', placeholder='min. 2 litery' name='g_name' required value=(undefined===gallery ? '' : gallery.name) )
-      label(for='g_description') Description:
-      input#g_description.form-control(type='text', placeholder='min. 2 litery' name='g_description' required value=(undefined===gallery ? '' : gallery.description))
-      
-      label(for='g_user') Owner:
-      select#g_user.form-control(name='g_user' required)
-        option(value='') --Select a user--
-        for user in users
-          if gallery
-            if user._id.toString()===gallery.user._id.toString()
-              option(value=user._id selected) #{user.name} #{user.surname}
-            else
-              option(value=user._id) #{user.name} #{user.surname}
-          else
-            option(value=user._id) #{user.name} #{user.surname}
-    button.btn.btn-primary(type='submit') Submit
+          .card-body
+            form(method='POST')
+              .form-group
+                label(for='g_name') Gallery name:
+                input#g_name.form-control(
+                  type='text',
+                  name='g_name',
+                  placeholder='min. 2 letters',
+                  required,
+                  value=(gallery ? gallery.name : '')
+                )
 
-  if messages
-    ul
-      for message in messages
-        li!= message
+              .form-group
+                label(for='g_description') Description:
+                input#g_description.form-control(
+                  type='text',
+                  name='g_description',
+                  placeholder='optional',
+                  required,
+                  value=(gallery ? gallery.description : '')
+                )
+
+              .form-group
+                label(for='g_user') Owner:
+                select#g_user.form-control(name='g_user', required)
+                  option(value='') --Select a user--
+                  for u in users
+                    if gallery && u._id.toString() === gallery.user._id.toString()
+                      option(value=u._id selected)= `${u.name} ${u.surname}`
+                    else
+                      option(value=u._id)= `${u.name} ${u.surname}`
+
+              button.btn.btn-success.btn-block(type='submit') Submit
+
+            if messages
+              .mt-3
+                ul.list-unstyled
+                  each message in messages
+                    li.text-info= message

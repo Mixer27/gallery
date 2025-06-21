@@ -1,18 +1,26 @@
 extends layout
 
 block content
-  h1= title
-  form(method='POST')
-    .form-group
-      label(for='username') Username:
-      input#username.form-control(type='text', placeholder='username', name='username', required, value='')
-      
-      label(for='password') Password:
-      input#password.form-control(type='password', placeholder='password', name='password', autocomplete='off', required, value='')
+  .container.mt-5
+    .row.justify-content-center
+      .col-md-6
+        .card
+          .card-header.bg-primary.text-white.text-center
+            h4.mb-0= title
+          .card-body
+            form(method='POST')
+              .form-group
+                label(for='username') Username:
+                input#username.form-control(type='text', placeholder='Enter username', name='username', required, value='')
 
-    button.btn.btn-primary(type='submit') Login
+              .form-group
+                label(for='password') Password:
+                input#password.form-control(type='password', placeholder='Enter password', name='password', autocomplete='off', required)
 
-  if messages
-    ul
-      each message in messages
-        li!= message
+              button.btn.btn-primary.btn-block(type='submit') Login
+
+            if messages
+              .mt-3
+                ul.list-unstyled
+                  each message in messages
+                    li.text-danger= message

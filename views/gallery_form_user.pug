@@ -1,22 +1,42 @@
 extends layout
 
 block content
-  h1= title
+  .container.mt-4
+    .row.justify-content-center
+      .col-md-8
+        .card
+          .card-header.bg-primary.text-white
+            h4.mb-0= title
 
-  form(method='POST')
-    div.form-group
-      label(for='g_name') Gallery name:
-      input#g_name.form-control(type='text', name='g_name', required, value=(gallery ? gallery.name : ''))
+          .card-body
+            form(method='POST')
+              .form-group
+                label(for='g_name') Gallery name:
+                input#g_name.form-control(
+                  type='text',
+                  name='g_name',
+                  required,
+                  placeholder='min. 2 letters',
+                  value=(gallery ? gallery.name : '')
+                )
 
-      label(for='g_description') Description:
-      input#g_description.form-control(type='text', name='g_description', required, value=(gallery ? gallery.description : ''))
+              .form-group
+                label(for='g_description') Description:
+                input#g_description.form-control(
+                  type='text',
+                  name='g_description',
+                  required,
+                  placeholder='optional',
+                  value=(gallery ? gallery.description : '')
+                )
 
-      // Pole użytkownika ukryte (zalogowany użytkownik)
-      input(type='hidden', name='g_user', value=currentUser._id)
+              // Ukryte pole z ID właściciela (logged in user)
+              input(type='hidden', name='g_user', value=currentUser._id)
 
-    button.btn.btn-primary(type='submit') Submit
+              button.btn.btn-success.btn-block(type='submit') Submit
 
-  if messages
-    ul
-      each message in messages
-        li= message
+            if messages
+              .mt-3
+                ul.list-unstyled
+                  each message in messages
+                    li.text-info= message

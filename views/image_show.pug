@@ -1,16 +1,21 @@
 extends layout
 
 block content
-  h1= title
-
-  if image
-    .image-container
-      h2= image.name
-      if image.gallery
-        p Gallery: #{image.gallery.name}
-      if image.description
-        p Description: #{image.description}
-      img(src=`${image.path}` alt=image.name style="max-width: 600px; max-height: 400px; margin-top: 10px;")
-
-  else
-    p Image not found.
+  .container.mt-4
+    if image
+      .card.mx-auto(style='max-width: 700px;')
+        .card-header.bg-primary.text-white
+          h2.mb-0= image.name
+        .card-body
+          if image.gallery
+            p.mb-1
+              strong Gallery: 
+              | #{image.gallery.name}
+          if image.description
+            p.mb-3
+              strong Description: 
+              | #{image.description}
+          img.img-fluid.border(src=`/images/${image.path}`, alt=image.name, style="max-height: 400px; display: block; margin: auto;")
+    else
+      .alert.alert-danger.text-center
+        | Image not found.

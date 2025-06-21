@@ -9,7 +9,7 @@ const authenticate = require('../middleware/authenticate');
 
 
 
-router.get("/", userController.userList);
+router.get("/", authenticate, userController.userList);
 
 // Obsługa GET: http://localhost/users/user_add
 router.get("/user_add", authenticate, userController.user_add_get);

@@ -6,7 +6,7 @@ const gallery_controller = require("../controllers/galleryController");
 // Middleware autentykacji
 const authenticate = require('../middleware/authenticate');
 
-router.get("/", gallery_controller.gallery_list);
+router.get("/", authenticate, gallery_controller.gallery_list);
 
 // Obsługa GET: http://localhost/galleries/gallery_add
 router.get("/gallery_add", authenticate, gallery_controller.gallery_add_get);

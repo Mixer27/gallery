@@ -4,7 +4,7 @@ const authenticate = require('../middleware/authenticate');
 
 const image_controller = require("../controllers/imageController");
 
-router.get("/", image_controller.image_list);
+router.get("/", authenticate, image_controller.image_list);
 
 // Wyświetlania powiększonego obrazka
 router.get("/image_show", authenticate, image_controller.image_show_get);

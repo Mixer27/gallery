@@ -1,21 +1,60 @@
 extends layout
 
 block content
-  h1=title
+  .container.mt-4
+    .row.justify-content-center
+      .col-md-8
+        .card
+          .card-header.bg-primary.text-white
+            h4.mb-0= title
 
-  form(method='POST')
-    div.form-group
-      label(for='name') Name:
-      input#name.form-control(type='text', placeholder='min. 2 litery' name='name' required value=(undefined===user ? '' : user.name) )
-      label(for='surname') Surname:
-      input#surname.form-control(type='text', placeholder='min. 2 litery' name='surname' required value=(undefined===user ? '' : user.surname))
-      label(for='username') Username:
-      input#username.form-control(type='text', placeholder='min. 3 litery' name='username' required value=(undefined===user ? '' : user.username))
-      label(for='password') Password:
-      input#password.form-control(type='password', minlength="8" placeholder='min. 8 litery' name='password' autocmplete='off' required value='' )
-    button.btn.btn-primary(type='submit') Submit
+          .card-body
+            form(method='POST')
+              .form-group
+                label(for='name') Name:
+                input#name.form-control(
+                  type='text',
+                  name='name',
+                  placeholder='min. 2 letters',
+                  required,
+                  value=(user ? user.name : '')
+                )
 
-  if messages
-    ul
-      for message in messages
-        li!= message
+              .form-group
+                label(for='surname') Surname:
+                input#surname.form-control(
+                  type='text',
+                  name='surname',
+                  placeholder='min. 2 letters',
+                  required,
+                  value=(user ? user.surname : '')
+                )
+
+              .form-group
+                label(for='username') Username:
+                input#username.form-control(
+                  type='text',
+                  name='username',
+                  placeholder='min. 3 letters',
+                  required,
+                  value=(user ? user.username : '')
+                )
+
+              .form-group
+                label(for='password') Password:
+                input#password.form-control(
+                  type='password',
+                  name='password',
+                  placeholder='min. 8 characters',
+                  required,
+                  minlength='8',
+                  autocomplete='off'
+                )
+
+              button.btn.btn-success.btn-block(type='submit') Submit
+
+            if messages
+              .mt-3
+                ul.list-unstyled
+                  each message in messages
+                    li.text-danger= message

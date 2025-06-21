@@ -1,36 +1,39 @@
 extends layout
 
 block content
-  h1= title
-  form(method='POST')
-    div.form-group
-      label(for='s_gallery') Select gallery:
-      //- lista rozwijana wyboru galerii
-      select#s_gallery.form-control(name='s_gallery', required)
-        for gallery in galleries
-          if (sel_gallery == gallery._id)
-            option(value=gallery._id, selected) #{gallery.name} #{gallery.user.username}
-          else
-            option(value=gallery._id) #{gallery.name} #{gallery.user.username}
-    button.btn.btn-primary(type='submit') Submit
+  .container.mt-4
+    h1.mb-4= title
 
-  if images
-    div(style="display:flex; flex-wrap:wrap;")
-      each image in images
-        div(style='display:flex; flex-direction:column; width:20%; height:100%; margin:20px;')
-          img(src=image.path, alt=image.path, style='max-width:200px; object-fit:scale-down;')
-          h2 #{image.name}
-          a Description: #{image.description}
-          a(href='/images/image_show?image_id=' + image._id)
-            button.btn.btn-primary(type='submit') Show
-          a(href='/images/image_update?image_id=' + image._id + '&gallery_id=' + sel_gallery)
-            button.btn.btn-primary(type='submit') Update
-          form(action='/images/image_delete/' + image._id, method='POST')
-            button.btn.btn-primary(type='submit') Delete
-  else
-    p There are no any images.
+    form(method='POST', class='mb-4')
+      .form-group
+        label(for='s_gallery') Select gallery:
+        select#s_gallery.form-control(name='s_gallery', required)
+          for gallery in galleries
+            if sel_gallery == gallery._id
+              option(value=gallery._id selected)= `${gallery.name}`
+            else
+              option(value=gallery._id)= `${gallery.name}`
+      button.btn.btn-primary(type='submit') Submit
 
-  if messages
-    ul
-      for message in messages
-        li!= message
+    if images && images.length
+      .row
+        each image in images
+          .col-md-4.mb-4
+            .card.h-100
+              img.card-img-top(src=`/images/${image.path}`, alt=image.name, style="object-fit:cover; height:200px;")
+              .card-body
+                h5.card-title= image.name
+                p.card-text= image.description
+              .card-footer.d-flex.justify-content-between
+                a.btn.btn-sm.btn-info(href=`/images/image_show?image_id=${image._id}`) Show
+                a.btn.btn-sm.btn-warning(href=`/images/image_update?image_id=${image._id}&gallery_id=${sel_gallery}`) Update
+                form(action=`/images/image_delete/${image._id}`, method='POST', style='display:inline')
+                  button.btn.btn-sm.btn-danger(type='submit') Delete
+    else
+      .alert.alert-info.text-center
+        | There are no images in this gallery.
+
+    if messages
+      ul.mt-3
+        each message in messages
+          li.text-danger!= message
