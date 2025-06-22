@@ -68,14 +68,10 @@ exports.gallery_add_post = [
     .isLength({ min: 1 })
     .escape(),
 
-  // Przetwarzanie po walidacji.
   asyncHandler(async (req, res, next) => {
-    // Przechwyt obiektu błędów walidacji.
     const errors = validationResult(req);
-    // Zapamiętanie listy userów
     const all_users = await user.find().sort({ last_name: 1 }).exec();
 
-    // Utworzenie obiektu modelu Gallery z danymi z formularza.
     const newgallery = new gallery({
       name: req.body.g_name,
       description: req.body.g_description,
@@ -83,14 +79,11 @@ exports.gallery_add_post = [
       date: new Date(),
     });
 
-    // Sprawdzenie i obsługa ewentualnych błędów.
     if (!errors.isEmpty()) {
-      // Jeśli pojawiły się błędy - ponownie wyrenderuj formularz i wypełnij pola wprowadzonymi danymi po sanityzacji.
 
       let myMessages = []
       errors.array().forEach(err => myMessages.push(err.msg))
 
-      // const all_users = await user.find().sort({ last_name: 1 }).exec();
       res.render("gallery_form", {
         title: "Add gallery:",
         gallery: newgallery,
