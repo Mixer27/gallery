@@ -156,6 +156,8 @@ Uruchom w katalogu głównym aplikacji:
 mongorestore --archive="backup/GalleryDB"
 ```
 
+W bazie są wgrane obrazki, dlatego aby aplikacja działała poprawnie po wczytaniu backupu bazy, wymagane jest korzystanie z najnowszej wersji z githuba (która ma w folderze `/public/images` obrazki wykorzystywane w bazie)
+
 ### 📦 Instalacja zależności
 
 ```bash
