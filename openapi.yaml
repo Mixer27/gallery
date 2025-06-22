@@ -1,0 +1,357 @@
+openapi: 3.0.3
+info:
+  title: Gallery App API
+  version: 1.0.0
+  description: API documentation for the Gallery Management application.
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Users
+  - name: Galleries
+  - name: Images
+  - name: Stats
+  - name: Auth
+
+paths:
+  /users:
+    get:
+      tags: [Users]
+      summary: Get list of users
+      responses:
+        '200':
+          description: A list of users
+
+  /users/user_add:
+    get:
+      tags: [Users]
+      summary: Show user registration form
+      responses:
+        '200':
+          description: Registration form
+    post:
+      tags: [Users]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                surname:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [name, surname, username, password]
+      responses:
+        '200':
+          description: User created
+
+  /users/user_delete/{user_id}:
+    post:
+      tags: [Users]
+      summary: Delete a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: User deleted and redirected
+
+  /users/user_login:
+    get:
+      tags: [Auth]
+      summary: Show login form
+      responses:
+        '200':
+          description: Login form
+    post:
+      tags: [Auth]
+      summary: Authenticate user
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [username, password]
+      responses:
+        '302':
+          description: Redirect on success
+
+  /users/user_logout:
+    get:
+      tags: [Auth]
+      summary: Log out current user
+      responses:
+        '302':
+          description: Redirect after logout
+
+  /galleries:
+    get:
+      tags: [Galleries]
+      summary: Get list of galleries
+      responses:
+        '200':
+          description: A list of galleries
+
+  /galleries/gallery_add:
+    get:
+      tags: [Galleries]
+      summary: Show form to add a gallery
+      responses:
+        '200':
+          description: Form rendered
+    post:
+      tags: [Galleries]
+      summary: Add new gallery
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                g_name:
+                  type: string
+                g_description:
+                  type: string
+                g_user:
+                  type: string
+              required: [g_name, g_user]
+      responses:
+        '200':
+          description: Gallery created
+
+  /galleries/gallery_update:
+    get:
+      tags: [Galleries]
+      summary: Show update form
+      parameters:
+        - in: query
+          name: gallery_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Form rendered
+
+  /galleries/gallery_update/{gallery_id}:
+    post:
+      tags: [Galleries]
+      summary: Update existing gallery
+      parameters:
+        - in: path
+          name: gallery_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                g_name:
+                  type: string
+                g_description:
+                  type: string
+                g_user:
+                  type: string
+              required: [g_name, g_user]
+      responses:
+        '302':
+          description: Redirect after update
+
+  /galleries/gallery_delete/{gallery_id}:
+    post:
+      tags: [Galleries]
+      summary: Delete a gallery and its images
+      parameters:
+        - in: path
+          name: gallery_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Gallery deleted
+
+  /galleries/gallery_browse:
+    get:
+      tags: [Galleries]
+      summary: Show browse gallery form
+      responses:
+        '200':
+          description: Form rendered
+    post:
+      tags: [Galleries]
+      summary: Browse images in selected gallery
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                s_gallery:
+                  type: string
+      responses:
+        '200':
+          description: Images displayed
+
+  /images:
+    get:
+      tags: [Images]
+      summary: List all images
+      responses:
+        '200':
+          description: All images
+
+  /images/image_show:
+    get:
+      tags: [Images]
+      summary: Show enlarged image
+      parameters:
+        - in: query
+          name: image_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Image shown
+
+  /images/image_add:
+    get:
+      tags: [Images]
+      summary: Show add image form
+      responses:
+        '200':
+          description: Form rendered
+    post:
+      tags: [Images]
+      summary: Add image metadata
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                i_name:
+                  type: string
+                i_description:
+                  type: string
+                i_gallery:
+                  type: string
+              required: [i_name, i_gallery]
+      responses:
+        '200':
+          description: Image added
+
+  /images/image_update:
+    get:
+      tags: [Images]
+      summary: Show update image form
+      parameters:
+        - in: query
+          name: image_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Form rendered
+    post:
+      tags: [Images]
+      summary: Update image
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                i_name:
+                  type: string
+                i_description:
+                  type: string
+                i_gallery:
+                  type: string
+                image_id:
+                  type: string
+              required: [i_name, i_gallery, image_id]
+      responses:
+        '302':
+          description: Redirect after update
+
+  /images/image_delete/{image_id}:
+    post:
+      tags: [Images]
+      summary: Delete an image and its file
+      parameters:
+        - in: path
+          name: image_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Image deleted
+
+  /images/image_upload:
+    get:
+      tags: [Images]
+      summary: Show image upload form
+      responses:
+        '200':
+          description: Form rendered
+    post:
+      tags: [Images]
+      summary: Upload image file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                i_path:
+                  type: string
+                  format: binary
+                i_name:
+                  type: string
+                i_description:
+                  type: string
+                i_gallery:
+                  type: string
+              required: [i_path, i_name, i_gallery]
+      responses:
+        '200':
+          description: Image uploaded
+
+  /stats:
+    get:
+      tags: [Stats]
+      summary: Get basic statistics
+      responses:
+        '200':
+          description: Returns users, galleries, and images count

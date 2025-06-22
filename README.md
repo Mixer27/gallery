@@ -20,6 +20,12 @@ Admin:
 Zwykły użytkownik:
 
 * zalogowanie się do aplikacji
-* dodawanie, edycja usuwanie galerii
-* dodawanie, edycja usuwanie obrazków
+* dodawanie (przez dedykowany formularz), edycja usuwanie galerii (z listy galerii)
+* dodawanie (przez dedykowany formularz), wyświetlanie, edycja oraz usuwanie obrazków (z widoku `Gallery browse`)
 * przeglądanie galerii swoich oraz innych użytkowników
+
+Import przykładowej bazy danych:
+
+```bash
+    # wywołać komendę w katalogu głównym aplikacji
+    mongorestore --archive="backup/GalleryDB"

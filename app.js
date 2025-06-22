@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const swaggerDocument = YAML.load('./openapi.yaml');
 
 // import routers - zadania temat8
 var indexRouter = require('./routes/index');
@@ -38,6 +41,7 @@ app.use('/users', usersRouter);
 app.use('/galleries', galleriesRouter);
 app.use('/images', imagesRouter);
 app.use('/stats', statsRouter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
