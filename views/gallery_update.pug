@@ -1,0 +1,52 @@
+extends layout
+
+block content
+    .container.mt-4
+        .row.justify-content-center
+            .col-md-8
+                .card
+                    .card-header.bg-primary.text-white
+                        h4.mb-0= title
+
+                    .card-body
+                        form(method='POST')
+                            .form-group
+                                label(for='g_name') Gallery name:
+                                input#g_name.form-control(
+                                    type='text',
+                                    name='g_name',
+                                    placeholder='min. 2 letters',
+                                    required,
+                                    value=(gallery ? gallery.name : '')
+                                )
+
+                            .form-group
+                                label(for='g_description') Description:
+                                input#g_description.form-control(
+                                    type='text',
+                                    name='g_description',
+                                    placeholder='optional',
+                                    required,
+                                    value=(gallery ? gallery.description : '')
+                                )
+
+                            .form-group
+                                label(for='g_user') Owner:
+                                select#g_user.form-control(name='g_user', required)
+                                    option(value='') --Select a user--
+                                    for u in users
+                                        if gallery && u._id.toString() === gallery.user._id.toString()
+                                            option(value=u._id selected)= `${u.name} ${u.surname}`
+                                        else
+                                            option(value=u._id)= `${u.name} ${u.surname}`
+
+                            input(type="hidden" name="gallery_id", value=gallery._id)
+
+
+                            button.btn.btn-success.btn-block(type='submit') Submit
+
+                        if messages
+                            .mt-3
+                                ul.list-unstyled
+                                    each message in messages
+                                        li.text-info= message

@@ -14,6 +14,12 @@ router.get("/gallery_add", authenticate, gallery_controller.gallery_add_get);
 // Obsługa POST: http://localhost/galleries/gallery_add
 router.post("/gallery_add", authenticate, gallery_controller.gallery_add_post);
 
+// Obsługa GET: http://localhost/galleries/gallery_update
+router.get("/gallery_update", authenticate, gallery_controller.gallery_update_get);
+
+// Obsługa POST: http://localhost/galleries/gallery_update
+router.post("/gallery_update", authenticate, gallery_controller.gallery_update_post);
+
 // Obsługa POST: http://localhost/galleries/gallery_delete/:gallery_id
 router.post("/gallery_delete/:gallery_id", authenticate, gallery_controller.gallery_delete);
 

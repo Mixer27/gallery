@@ -127,6 +127,67 @@ exports.gallery_add_post = [
   }),
 ];
 
+// GET - formularz edycji galerii
+exports.gallery_update_get = asyncHandler(async (req, res, next) => {
+  const galleryId = req.query.gallery_id;
+  const username = req.loggedUser;
+
+  const gal = await gallery.findById(galleryId).populate("user").exec();
+  const all_users = await user.find().sort({ surname: 1 }).exec();
+
+  if (!gal) {
+    return res.status(404).send("Gallery not found");
+  }
+  console.log(gal, req.user)
+
+  if (username === "admin") {
+    res.render("gallery_update", {
+    title: "Edit gallery",
+    gallery: gal,
+    users: all_users,
+  });  
+  }
+
+  res.render("gallery_update_user", {
+    title: "Edit gallery",
+    gallery: gal,
+    currentUser: req.user
+  });
+});
+
+// POST - przetwarzanie edycji galerii
+exports.gallery_update_post = [
+  body("g_name", "Gallery name too short.").trim().isLength({ min: 2 }).escape(),
+  body("g_description").trim().escape(),
+  body("g_user", "Owner must be selected").trim().notEmpty().escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    const all_users = await user.find().sort({ surname: 1 }).exec();
+
+    const updatedGallery = new gallery({
+      _id: req.body.gallery_id,
+      name: req.body.g_name,
+      description: req.body.g_description,
+      user: req.body.g_user,
+      date: new Date(),
+    });
+
+    if (!errors.isEmpty()) {
+      return res.render("gallery_update", {
+        title: "Edit gallery",
+        gallery: updatedGallery,
+        users: all_users,
+        messages: errors.array().map(err => err.msg),
+      });
+    }
+    console.log(req.body.gallery_id, updatedGallery._id , updatedGallery);
+    await gallery.findByIdAndUpdate(updatedGallery._id, updatedGallery);
+    res.redirect("/galleries");
+  })
+];
+
+
 // usuwanie galerii wraz z jej wszystkimi obrazkami
 exports.gallery_delete = asyncHandler(async (req, res, next) => {
   const galleryId = req.params.gallery_id;
