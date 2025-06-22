@@ -16,6 +16,7 @@ var galleriesRouter = require('./routes/galleries');
 var imagesRouter = require('./routes/images');
 var statsRouter = require('./routes/stats');
 const authenticateOptional = require('./middleware/authenticateOptional');
+const authenticate = require('./middleware/authenticate')
 
 // app object
 var app = express();
@@ -41,7 +42,7 @@ app.use('/users', usersRouter);
 app.use('/galleries', galleriesRouter);
 app.use('/images', imagesRouter);
 app.use('/stats', statsRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', authenticate, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
